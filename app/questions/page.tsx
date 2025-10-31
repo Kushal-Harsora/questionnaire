@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
+import { DevModeToggle } from '@/components/custom/dev-toggle-theme';
 
 // Icon Imports
 import { Lightbulb } from 'lucide-react';
@@ -148,7 +149,7 @@ const Page = () => {
                     'Content-Type': 'Application/Json'
                 }
             });
-            
+
             const data = response.data;
 
             if (response.status === 200) {
@@ -245,26 +246,30 @@ const Page = () => {
                         Question {count + 1} / {sampleQuestions.length}
                     </CardTitle>
 
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                title="Show Hint"
-                                className="ml-auto"
-                            >
-                                <Lightbulb className="h-5 w-5 text-amber-500" />
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-md max-md:max-w-xs">
-                            <DialogHeader>
-                                <DialogTitle>💡 Hint</DialogTitle>
-                            </DialogHeader>
-                            <p className="text-base text-foreground mt-2">
-                                {currentQuestion.hint}
-                            </p>
-                        </DialogContent>
-                    </Dialog>
+                    <div className=' w-fit h-full flex flex-row items-center justify-center gap-2'>
+                        <DevModeToggle />
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    title="Show Hint"
+                                    className="ml-auto"
+                                >
+                                    <Lightbulb className="h-5 w-5 text-amber-500" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md max-md:max-w-xs">
+                                <DialogHeader>
+                                    <DialogTitle>💡 Hint</DialogTitle>
+                                </DialogHeader>
+                                <p className="text-base text-foreground mt-2">
+                                    {currentQuestion.hint}
+                                </p>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+
                 </CardHeader>
 
                 <CardContent className="h-full w-full flex flex-col items-center justify-center gap-6">
