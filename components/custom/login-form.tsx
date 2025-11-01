@@ -95,9 +95,9 @@ export function LoginForm({
                             <div className="flex size-8 items-center justify-center rounded-md">
                                 <GalleryVerticalEnd className="size-6" />
                             </div>
-                            <span className="sr-only">Questionaire Inc.</span>
+                            <span className="sr-only">Questionnaire Inc.</span>
                         </a>
-                        <h1 className="text-xl font-bold">Welcome to Questionaire Inc.</h1>
+                        <h1 className="text-xl font-bold">Welcome to Questionnaire Inc.</h1>
                         <FieldDescription>
                             Don&apos;t have an account? <Link onClick={() => toast.info("Under Development!")} href="/">Sign up</Link>
                         </FieldDescription>

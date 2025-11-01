@@ -25,7 +25,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Questionaire",
+  title: "Questionnaire",
   description: "Question System - Manage your forms effectively",
 };
 
