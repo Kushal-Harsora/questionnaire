@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
-  if (request.nextUrl.pathname.startsWith("/questions")) {
+  if (request.nextUrl.pathname.startsWith("/questions") || request.nextUrl.pathname.startsWith("/form") ) {
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
     }
@@ -34,6 +34,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/questions',
+    '/form',
     '/'
   ],
 }

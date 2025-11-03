@@ -31,7 +31,7 @@ const Page = () => {
     const [loading, setLoading] = React.useState<boolean>(false);
     const [showResults, setShowResults] = React.useState<boolean>(false);
 
-    // ✅ Sample Questions for Marketing
+    // Sample Questions for Marketing
     const sampleQuestions = [
         [
             {

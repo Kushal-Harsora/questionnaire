@@ -114,7 +114,6 @@ export function LoginForm({
                                     id="email"
                                     aria-invalid={fieldState.invalid}
                                     placeholder="someone@example.com"
-                                    autoComplete="off"
                                 />
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]} />
@@ -138,10 +137,6 @@ export function LoginForm({
                                     placeholder="password"
                                     autoComplete="off"
                                 />
-                                <FieldDescription>
-                                    Include steps to reproduce, expected behavior, and what
-                                    actually happened.
-                                </FieldDescription>
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]} />
                                 )}
