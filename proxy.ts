@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
-  if (request.nextUrl.pathname.startsWith("/questions") || request.nextUrl.pathname.startsWith("/form") || request.nextUrl.pathname.startsWith("/backend")) {
+  if (request.nextUrl.pathname.startsWith("/questions") || request.nextUrl.pathname.startsWith("/form") || request.nextUrl.pathname.startsWith("/backend") || request.nextUrl.pathname.startsWith("/router")) {
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
     }
@@ -36,6 +36,7 @@ export const config = {
     '/questions',
     '/form',
     '/backend',
+    '/router',
     '/'
   ],
 }
