@@ -1,8 +1,10 @@
+'use server';
+
 // Helper Libs
-import { NextResponse } from "next/server"
-import nodemailer from "nodemailer"
-import { formatInTimeZone } from "date-fns-tz"
-import dotenv from 'dotenv'
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
+import dotenv from "dotenv";
 
 
 // Environment Config
@@ -11,25 +13,27 @@ dotenv.config();
 
 // Handle form submit
 export async function POST(req: Request) {
-    try {
-        const { name, email, timeSlot, remark } = await req.json();
+  try {
+    const { name, email, timeSlot, remark } = await req.json();
 
-        const timeZone = "Asia/Kolkata";
+    const timeZone = "Asia/Kolkata";
 
-        const startDate = new Date(timeSlot.date);
-        const [startH, startM, startS] = timeSlot.startTime.split(":").map(Number);
-        const [endH, endM, endS] = timeSlot.endTime.split(":").map(Number);
+    const startDate = toZonedTime(timeSlot.date, timeZone);
 
-        const startLocal = new Date(startDate);
-        startLocal.setHours(startH, startM, startS, 0);
+    const [startH, startM, startS] = timeSlot.startTime.split(":").map(Number);
+    const [endH, endM, endS] = timeSlot.endTime.split(":").map(Number);
 
-        const endLocal = new Date(startDate);
-        endLocal.setHours(endH, endM, endS, 0);
+    const startLocal = new Date(startDate);
+    startLocal.setHours(startH, startM, startS, 0);
 
-        const formattedStart = formatInTimeZone(startLocal, timeZone, "yyyyMMdd'T'HHmmss");
-        const formattedEnd = formatInTimeZone(endLocal, timeZone, "yyyyMMdd'T'HHmmss");
+    const endLocal = new Date(startDate);
+    endLocal.setHours(endH, endM, endS, 0);
 
-        const icsContent = `
+    const formattedStart = formatInTimeZone(startLocal, timeZone, "yyyyMMdd'T'HHmmss");
+    const formattedEnd = formatInTimeZone(endLocal, timeZone, "yyyyMMdd'T'HHmmss");
+    const formattedNow = formatInTimeZone(new Date(), timeZone, "yyyyMMdd'T'HHmmss");
+
+    const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Your Company//Booking Invite//EN
@@ -37,7 +41,7 @@ CALSCALE:GREGORIAN
 METHOD:REQUEST
 BEGIN:VEVENT
 UID:${Date.now()}@yourdomain.com
-DTSTAMP:${formatInTimeZone(new Date(), timeZone, "yyyyMMdd'T'HHmmss")}
+DTSTAMP:${formattedNow}
 DTSTART;TZID=${timeZone}:${formattedStart}
 DTEND;TZID=${timeZone}:${formattedEnd}
 SUMMARY:Consultation Booking with ${name}
@@ -46,53 +50,45 @@ LOCATION:Online / Office
 STATUS:CONFIRMED
 END:VEVENT
 END:VCALENDAR
-    `.trim()
+    `.trim();
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_ID,
-                pass: process.env.EMAIL_PASSWORD,
-            },
-        });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_ID,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
 
-        const formattedDate = startLocal.toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
+    const formattedDate = formatInTimeZone(startLocal, timeZone, "EEEE, MMMM d, yyyy");
 
-        await transporter.sendMail({
-            from: `${process.env.APP_NAME} <${process.env.EMAIL_ID}>`,
-            to: email,
-            subject: `Your Consultation Call Confirmation with ${process.env.APP_NAME}`,
-            text: `Hello ${name},
+    await transporter.sendMail({
+      from: `${process.env.APP_NAME} <${process.env.EMAIL_ID}>`,
+      to: email,
+      subject: `Your Consultation Call Confirmation with ${process.env.APP_NAME}`,
+      text: `Hello ${name},
 
-                   Your consultation call with ${process.env.APP_NAME} is confirmed.
+Your consultation call with ${process.env.APP_NAME} is confirmed.
 
-                   Date: ${formattedDate}
-                   Time: ${timeSlot.startTime} - ${timeSlot.endTime} (${timeZone})
+Date: ${formattedDate}
+Time: ${timeSlot.startTime} - ${timeSlot.endTime} (${timeZone})
 
-                   Remark: ${remark}`,
-            icalEvent: {
-                filename: "invite.ics",
-                method: "REQUEST",
-                content: icsContent,
-            },
-        });
+Remark: ${remark}`,
+      icalEvent: {
+        filename: "invite.ics",
+        method: "REQUEST",
+        content: icsContent,
+      },
+    });
 
-        const response = NextResponse.json({ message: "Form Submitted Successfully!" }, { status: 200 });
-        response.cookies.set("token", "", {
-            httpOnly: true,
-            expires: new Date(0)
-        });
+    const response = NextResponse.json({ message: "Form Submitted Successfully!" }, { status: 200 });
+    response.cookies.set("token", "", { httpOnly: true, expires: new Date(0) });
+    return response;
 
-        return response;
-    } catch (error) {
-        console.error("Error sending invite:", error);
-        if (error instanceof Error)
-            return NextResponse.json({ error: error.message }, { status: 500 })
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
-    }
+  } catch (error) {
+    console.error("Error sending invite:", error);
+    if (error instanceof Error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
